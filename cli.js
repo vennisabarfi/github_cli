@@ -1,10 +1,20 @@
 const {Command} = require("commander");
 const program  = new Command();
 const chalk = require("chalk");
-const inquirer = require('inquirer'); //read documentation
+const inquirer = require('inquirer'); //read documentation  
 const ora = require("ora");
- const {octokit} = require("octokit");
- 
+const {octokit, Octokit} = require("octokit"); 
+require('dotenv').config(); //load .env file
+console.log(process.env.github_TOKEN);
+
+
+const ocktokit = new Octokit({
+    auth: process.env.github_TOKEN,
+})
+
+//or no authentication(lower rate limit and limited endpoints)
+//const octokit = new Octokit({});
+
 program.version("1.0.0").description("My Node CLI");
 
  program.action(function(){
