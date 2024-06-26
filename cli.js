@@ -3,7 +3,7 @@ const program  = new Command();
 const chalk = require("chalk");
 const inquirer = require('inquirer'); //read documentation 
 const ora = require("ora");
-const {octokit, Octokit} = require("octokit"); 
+const {Octokit} = require("octokit"); 
 
 try {
     require('dotenv').config(); //load .env file
@@ -14,15 +14,16 @@ try {
 // console.log(process.env.github_TOKEN);
 
 
-const ocktokit = new Octokit({
+const octokit = new Octokit({
     auth: process.env.github_TOKEN,
 })
+
 
 //or no authentication(lower rate limit and limited endpoints)
 //const octokit = new Octokit({});
 
 //useful documentation: https://docs.github.com/en/rest/commits/statuses?apiVersion=2022-11-28
-
+//extra documentation: https://docs.github.com/en/rest/repos?apiVersion=2022-11-28 
 //add try and catch statements to authenticate information given for owner, repo and ref
 program.version("1.0.0").description("My Node CLI");
 
@@ -58,11 +59,14 @@ const optionsArray = ["Track Commit Status", "View Github Logs ","View Files in 
     .then(async function(result){
         if(result.choice == "Track Commit Status"){
             try {
-                response = await octokit.request('GET /repos/{owner}/{repo}/commits/{ref}/status',
+                const response = await octokit.request(`GET/repos/{owner}/{repo}/commits/{ref}/status`,
                     {
                         owner: result.owner,
                         repo: result.repo,
                         ref: result.ref,
+                        headers:{
+
+                        }
                     }
                 )
            
