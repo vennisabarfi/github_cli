@@ -12,6 +12,7 @@
   "description": "",
   "dependencies": {
     "@inquirer/input": "^2.1.10",
+    "@octokit/rest": "^21.0.0",
     "axios": "^1.7.2",
     "chalk": "^4.1.2",
     "commander": "^12.1.0",

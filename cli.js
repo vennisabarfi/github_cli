@@ -21,6 +21,8 @@ const ocktokit = new Octokit({
 //or no authentication(lower rate limit and limited endpoints)
 //const octokit = new Octokit({});
 
+//useful documentation: https://docs.github.com/en/rest/commits/statuses?apiVersion=2022-11-28
+
 //add try and catch statements to authenticate information given for owner, repo and ref
 program.version("1.0.0").description("My Node CLI");
 
@@ -53,21 +55,29 @@ const optionsArray = ["Track Commit Status", "View Github Logs ","View Files in 
      //run scripts when specific options chosen. Use if responses.choices
         
     ])
-    .then(function(result){
-        if(result == "Track Commit Status"){
+    .then(async function(result){
+        if(result.choice == "Track Commit Status"){
             try {
-                
+                response = await octokit.request('GET /repos/{owner}/{repo}/commits/{ref}/status',
+                    {
+                        owner: result.owner,
+                        repo: result.repo,
+                        ref: result.ref,
+                    }
+                )
+           
+                console.log(response);
             } catch (error) {
             console.log(`Error Completing Task. More info here: ${error}`);
             }
         }
-
         //integrate this properly into if condition
         const spinner = ora(`Doing ${result.choice}...`).start(); //Start the spinner
-
         setTimeout(function(){
         spinner.succeed(chalk.green("Done!"));
         }, 3000);
+        
+        
         
     })
  })
