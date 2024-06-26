@@ -28,7 +28,7 @@ const octokit = new Octokit({
 //add try and catch statements to authenticate information given for owner, repo and ref
 program.version("1.0.0").description("My Node CLI");
 
-const optionsArray = ["Track Commit Status", "View Repository Activity", "View # of Repo Contributers and Number of  Commits","View Files in Repository"];
+const optionsArray = ["Track Commit Status", "View Repository Activity", "View Number of Repo Contributers and Number of Commits","View Files in Repository", "Create a New Issue"];
  program.action(function(){
     inquirer
     .prompt([
@@ -71,7 +71,6 @@ const optionsArray = ["Track Commit Status", "View Repository Activity", "View #
                         }
                     }
                 )
-           
                 console.log(response.data); //find a way to narrow down to commit
             } catch (error) {
             console.log(`Error Completing Task. More info here: ${error}`);
@@ -96,9 +95,9 @@ const optionsArray = ["Track Commit Status", "View Repository Activity", "View #
             }
         }
 
-        else if(result.choice == "View # of Repo Contributers and Number of  Commits"){
+        else if(result.choice == "View Number of Repo Contributers and Number of Commits"){
             try {
-                let response = await octokit.request('GET /repos/{owner}/{repo}/activity',
+                let response = await octokit.request('GET /repos/{owner}/{repo}/contributors',
                     {
                         owner: result.owner,
                         repo: result.repo,
@@ -108,8 +107,35 @@ const optionsArray = ["Track Commit Status", "View Repository Activity", "View #
                         }
                     }
                 )
-           
-                console.log(response.data); //find a way to narrow down to commit
+                //filter for important information 
+                let contributors = response.data.map(function(contributor){
+                    const{login,id,html_url,site_admin, contributions} = contributor;
+                    return{login, id,html_url, site_admin, contributions}
+                });
+                console.log(contributors); 
+            } catch (error) {
+            console.log(`Error Completing Task. More info here: ${error}`);
+            }
+        }
+        
+        else if(result.choice == "View Files in Repository"){
+            try {
+                let response = await octokit.request('GET /repos/{owner}/{repo}/contributors',
+                    {
+                        owner: result.owner,
+                        repo: result.repo,
+                        ref: result.ref,
+                        headers:{
+                            
+                        }
+                    }
+                )
+                //filter for important information 
+                let contributors = response.data.map(function(contributor){
+                    const{login,id,html_url,site_admin, contributions} = contributor;
+                    return{login, id,html_url, site_admin, contributions}
+                });
+                console.log(contributors); 
             } catch (error) {
             console.log(`Error Completing Task. More info here: ${error}`);
             }
