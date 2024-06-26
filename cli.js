@@ -22,13 +22,11 @@ const octokit = new Octokit({
 //or no authentication(lower rate limit and limited endpoints)
 //const octokit = new Octokit({});
 
-//useful documentation: https://docs.github.com/en/rest/commits/statuses?apiVersion=2022-11-28
-//extra documentation: https://docs.github.com/en/rest/repos?apiVersion=2022-11-28 
-//useful documentation for commits: https://docs.github.com/en/rest/commits/commits?apiVersion=2022-11-28#list-commits 
-//add try and catch statements to authenticate information given for owner, repo and ref
+
+//add try and catch statements to authenticate information given for owner, repo and ref (do this in testing)
 program.version("1.0.0").description("My Node CLI");
 
-const optionsArray = ["Track Commit Status", "View Repository Activity", "View Number of Repo Contributers and Number of Commits","View Files in Repository", "Create a New Issue"];
+const optionsArray = ["Track Commit Status", "View Repository Activity", "View Number of Repo Contributers and Number of Commits","List Repository Issues"];
  program.action(function(){
     inquirer
     .prompt([
@@ -54,11 +52,10 @@ const optionsArray = ["Track Commit Status", "View Repository Activity", "View N
             choices: optionsArray,
             default: "Track Commit Status",
         },
-     //run scripts when specific options chosen. Use if responses.choices
         
     ]) 
     .then(async function(result){
-        //include pagination to results here
+        //include pagination to results here. Track commit status on a branch.
         if(result.choice == "Track Commit Status"){
             try {
                 let response = await octokit.request('GET /repos/{owner}/{repo}/commits/{ref}',
@@ -118,9 +115,9 @@ const optionsArray = ["Track Commit Status", "View Repository Activity", "View N
             }
         }
         
-        else if(result.choice == "View Files in Repository"){
+        else if(result.choice == "List Repository Issues"){
             try {
-                let response = await octokit.request('GET /repos/{owner}/{repo}/contributors',
+                let response = await octokit.request('GET /repos/{owner}/{repo}/issues',
                     {
                         owner: result.owner,
                         repo: result.repo,
@@ -131,11 +128,7 @@ const optionsArray = ["Track Commit Status", "View Repository Activity", "View N
                     }
                 )
                 //filter for important information 
-                let contributors = response.data.map(function(contributor){
-                    const{login,id,html_url,site_admin, contributions} = contributor;
-                    return{login, id,html_url, site_admin, contributions}
-                });
-                console.log(contributors); 
+                console.log(response); 
             } catch (error) {
             console.log(`Error Completing Task. More info here: ${error}`);
             }
