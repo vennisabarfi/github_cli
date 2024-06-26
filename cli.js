@@ -59,18 +59,18 @@ const optionsArray = ["Track Commit Status", "View Github Logs ","View Files in 
     .then(async function(result){
         if(result.choice == "Track Commit Status"){
             try {
-                const response = await octokit.request(`GET/repos/{owner}/{repo}/commits/{ref}/status`,
+                const response = await octokit.request('GET /repos/{owner}/{repo}/issues',
                     {
                         owner: result.owner,
                         repo: result.repo,
-                        ref: result.ref,
+                        // ref: result.ref,
                         headers:{
 
                         }
                     }
                 )
            
-                console.log(response);
+                console.log(response.data);
             } catch (error) {
             console.log(`Error Completing Task. More info here: ${error}`);
             }
