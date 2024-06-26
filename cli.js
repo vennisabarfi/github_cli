@@ -24,6 +24,7 @@ const ocktokit = new Octokit({
 //add try and catch statements to authenticate information given for owner, repo and ref
 program.version("1.0.0").description("My Node CLI");
 
+const optionsArray = ["Track Commit Status", "View Github Logs ","View Files in Repository"];
  program.action(function(){
     inquirer
     .prompt([
@@ -46,16 +47,28 @@ program.version("1.0.0").description("My Node CLI");
             type: "list",
             name: "choice",
             message: "Choose an option: ",
-            choices: ["Track Commit Status: ", "Option 2: ","Option 3: "],
+            choices: optionsArray,
+            default: "Track Commit Status",
         },
-     
+     //run scripts when specific options chosen. Use if responses.choices
+        
     ])
     .then(function(result){
+        if(result == "Track Commit Status"){
+            try {
+                
+            } catch (error) {
+            console.log(`Error Completing Task. More info here: ${error}`);
+            }
+        }
+
+        //integrate this properly into if condition
         const spinner = ora(`Doing ${result.choice}...`).start(); //Start the spinner
 
         setTimeout(function(){
-            spinner.succeed(chalk.green("Done!"));
+        spinner.succeed(chalk.green("Done!"));
         }, 3000);
+        
     })
  })
     program.parse(process.argv);
