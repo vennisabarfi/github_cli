@@ -24,27 +24,28 @@ const octokit = new Octokit({
 
 //useful documentation: https://docs.github.com/en/rest/commits/statuses?apiVersion=2022-11-28
 //extra documentation: https://docs.github.com/en/rest/repos?apiVersion=2022-11-28 
+//useful documentation for commits: https://docs.github.com/en/rest/commits/commits?apiVersion=2022-11-28#list-commits 
 //add try and catch statements to authenticate information given for owner, repo and ref
 program.version("1.0.0").description("My Node CLI");
 
-const optionsArray = ["Track Commit Status", "View Github Logs ","View Files in Repository"];
+const optionsArray = ["Track Commit Status", "View Repository Activity", "View # of Repo Contributers and Number of  Commits","View Files in Repository"];
  program.action(function(){
     inquirer
     .prompt([
         {
             name: "owner",
             type: "input",
-            message: "Enter your github username: "
+            message: chalk.blue("Enter your github username: ")
         },
         {
             name: "repo",
             type: "input",
-            message: "Enter the github repo name: "
+            message: chalk.red("Enter the github repo name: ")
         },
         {
             name: "ref",
             type: "input",
-            message: "Enter the branch name: "
+            message: chalk.green("Enter the branch name: ")
         },
         {
             type: "list",
@@ -60,11 +61,11 @@ const optionsArray = ["Track Commit Status", "View Github Logs ","View Files in 
         //include pagination to results here
         if(result.choice == "Track Commit Status"){
             try {
-                const response = await octokit.request('GET /repos/{owner}/{repo}/commits',
+                let response = await octokit.request('GET /repos/{owner}/{repo}/commits/{ref}',
                     {
                         owner: result.owner,
                         repo: result.repo,
-                        // ref: result.ref,
+                        ref: result.ref,
                         headers:{
 
                         }
@@ -76,8 +77,45 @@ const optionsArray = ["Track Commit Status", "View Github Logs ","View Files in 
             console.log(`Error Completing Task. More info here: ${error}`);
             }
         }
+        else if(result.choice == "View Repository Activity"){
+            try {
+                let response = await octokit.request('GET /repos/{owner}/{repo}/activity',
+                    {
+                        owner: result.owner,
+                        repo: result.repo,
+                        ref: result.ref,
+                        headers:{
+                            
+                        }
+                    }
+                )
+           
+                console.log(response.data); //find a way to narrow down to commit
+            } catch (error) {
+            console.log(`Error Completing Task. More info here: ${error}`);
+            }
+        }
+
+        else if(result.choice == "View # of Repo Contributers and Number of  Commits"){
+            try {
+                let response = await octokit.request('GET /repos/{owner}/{repo}/activity',
+                    {
+                        owner: result.owner,
+                        repo: result.repo,
+                        ref: result.ref,
+                        headers:{
+                            
+                        }
+                    }
+                )
+           
+                console.log(response.data); //find a way to narrow down to commit
+            } catch (error) {
+            console.log(`Error Completing Task. More info here: ${error}`);
+            }
+        }
         //integrate this properly into if condition
-        const spinner = ora(`Doing ${result.choice}...`).start(); //Start the spinner
+        const spinner = ora(`Completing Task: ${result.choice}...`).start(); //Start the spinner
         setTimeout(function(){
         spinner.succeed(chalk.green("Done!"));
         }, 3000);
