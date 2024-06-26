@@ -55,11 +55,12 @@ const optionsArray = ["Track Commit Status", "View Github Logs ","View Files in 
         },
      //run scripts when specific options chosen. Use if responses.choices
         
-    ])
+    ]) 
     .then(async function(result){
+        //include pagination to results here
         if(result.choice == "Track Commit Status"){
             try {
-                const response = await octokit.request('GET /repos/{owner}/{repo}/issues',
+                const response = await octokit.request('GET /repos/{owner}/{repo}/commits',
                     {
                         owner: result.owner,
                         repo: result.repo,
@@ -70,7 +71,7 @@ const optionsArray = ["Track Commit Status", "View Github Logs ","View Files in 
                     }
                 )
            
-                console.log(response.data);
+                console.log(response.data); //find a way to narrow down to commit
             } catch (error) {
             console.log(`Error Completing Task. More info here: ${error}`);
             }
