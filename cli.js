@@ -3,8 +3,12 @@ const program  = new Command();
 const chalk = require("chalk");
 const inquirer = require('inquirer'); //read documentation 
 const ora = require("ora");
+const fs = require('fs');
 const {Octokit} = require("octokit"); 
 
+//File path to save results
+const file_path = `${process.cwd()}`; //current directory
+console.log(file_path);
 try {
     require('dotenv').config(); //load .env file
 } catch (error) {
@@ -129,18 +133,40 @@ const optionsArray = ["Track Commit Status", "View Repository Activity", "View N
                 )
                 //filter for important information 
                 console.log(response); 
+                return inquirer
+                .prompt([
+                    {
+                        name: "save_file",
+                        type: "confirm",
+                        message: chalk.blue("Save Results to File?: "),
+                    },])
+                    .then(function(answers){
+                        try {
+                            if(answers.save_file){
+                                fs.writeFileSync(`${file_path}\issues_list.txt`, JSON.stringify(response, null, 4), 'utf8'); // pretty print
+                                const spinner = ora(`Saving Results to File...`).start();
+                                setTimeout(function(){
+                                    spinner.succeed(chalk.green(`Results saved to: ${file_path}\\issues_list.txt`)); 
+                                }, 3000);
+                            }
+                            else{
+                                console.log("Results not saved!");
+                            }
+                        } catch (err) {
+                            console.log(err);
+                        }
+                    })
+
+                     //integrate this properly into if condition
+                    const spinner = ora(`Completing Task: ${result.choice}...`).start(); //Start the spinner
+                    setTimeout(function(){
+                    spinner.succeed(chalk.green("Done!"));
+                    }, 3000);
             } catch (error) {
             console.log(`Error Completing Task. More info here: ${error}`);
             }
         }
-        //integrate this properly into if condition
-        const spinner = ora(`Completing Task: ${result.choice}...`).start(); //Start the spinner
-        setTimeout(function(){
-        spinner.succeed(chalk.green("Done!"));
-        }, 3000);
-        
-        
-        
     })
+ 
  })
     program.parse(process.argv);
