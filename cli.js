@@ -4,32 +4,27 @@ const chalk = require("chalk");
 const inquirer = require('inquirer'); //read documentation 
 const ora = require("ora");
 const fs = require('fs');
-const {colorize} = require('json-colorizer');
 const {Octokit} = require("octokit"); 
 
 //File path to save results
 const file_path = `${process.cwd()}`; //current directory
-console.log(file_path);
+// console.log(file_path);
 try {
     require('dotenv').config(); //load .env file
 } catch (error) {
     console.log(`Error loading secret keys. Info: ${error}`);
 }
 
-// console.log(process.env.github_TOKEN);
-
-
 const octokit = new Octokit({
     auth: process.env.github_TOKEN,
 })
-
 
 //or no authentication(lower rate limit and limited endpoints)
 //const octokit = new Octokit({});
 
 
-//add try and catch statements to authenticate information given for owner, repo and ref (do this in testing)
-program.version("1.0.0").description("My Node CLI");
+
+program.version("1.0.0").description("My GitHub CLI");
 
 const optionsArray = ["Track Commit Status", "View Repository Activity", "View Number of Repo Contributers and Number of Commits","List Repository Issues"];
  program.action(function(){
@@ -60,7 +55,6 @@ const optionsArray = ["Track Commit Status", "View Repository Activity", "View N
         
     ]) 
     .then(async function(result){
-        //include pagination to results here. Track commit status on a branch.
         if(result.choice == "Track Commit Status"){
             try {
                 let response = await octokit.request('GET /repos/{owner}/{repo}/commits/{ref}',
@@ -76,7 +70,7 @@ const optionsArray = ["Track Commit Status", "View Repository Activity", "View N
                 const spinner = ora(`Completing Task: ${result.choice}...`).start();
                 setTimeout(function(){
                     spinner.succeed(console.log(response), chalk.green(`Task Completed! Press Any Key to See More Options!`)); 
-                }, 3000); //use pagination or other method to filter
+                }, 3000); 
                 return inquirer
                 .prompt([
                     {
@@ -93,7 +87,7 @@ const optionsArray = ["Track Commit Status", "View Repository Activity", "View N
                         },
                     },
                 
-                ]) //add some testing to prompts and also saving files
+                ]) 
                     .then(function(answers){
                         try {
                             if(answers.save_file){
@@ -149,7 +143,7 @@ const optionsArray = ["Track Commit Status", "View Repository Activity", "View N
                         },
                     },
                 
-                ]) //add some testing to prompts and also saving files
+                ]) 
                     .then(function(answers){
                         try {
                             if(answers.save_file){
@@ -212,7 +206,7 @@ const optionsArray = ["Track Commit Status", "View Repository Activity", "View N
                         },
                     },
                 
-                ]) //add some testing to prompts and also saving files (check if file path already exists and then prompt the user to try again. Find a way to not exit maybe a while loop till the user breaks?)
+                ]) 
                     .then(function(answers){
                         try {
                             if(answers.save_file){
@@ -297,3 +291,4 @@ const optionsArray = ["Track Commit Status", "View Repository Activity", "View N
  
  })
     program.parse(process.argv);
+    

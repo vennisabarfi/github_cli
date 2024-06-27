@@ -25,5 +25,8 @@
     "octokit": "^3.2.1",
     "ora": "^5.4.1",
     "yargs": "^17.7.2"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
   }
 }
