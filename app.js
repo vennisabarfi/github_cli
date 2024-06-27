@@ -1,6 +1,10 @@
 const express = require('express');
 const app = express();
 const PORT = 3000;
+const cli_tool = require('./cli');
+
+//use tool here
+app.use(cli_tool);
 
 app.listen(PORT, function(){
     try {

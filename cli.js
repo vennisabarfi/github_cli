@@ -4,6 +4,7 @@ const chalk = require("chalk");
 const inquirer = require('inquirer'); //read documentation 
 const ora = require("ora");
 const fs = require('fs');
+const {colorize} = require('json-colorizer');
 const {Octokit} = require("octokit"); 
 
 //File path to save results
@@ -72,9 +73,47 @@ const optionsArray = ["Track Commit Status", "View Repository Activity", "View N
                         }
                     }
                 )
-                console.log(response.data); //find a way to narrow down to commit
+                const spinner = ora(`Completing Task: ${result.choice}...`).start();
+                setTimeout(function(){
+                    spinner.succeed(console.log(response), chalk.green(`Task Completed! Press Any Key to See More Options!`)); 
+                }, 3000); //use pagination or other method to filter
+                return inquirer
+                .prompt([
+                    {
+                        name: "save_file",
+                        type: "confirm",
+                        message: chalk.blue("Save Results to File?: "),
+                    },
+                    {
+                        name: "file_name",
+                        type: "input",
+                        message: chalk.blue("Enter File Name Here: "),
+                        when: function(answers){
+                            return answers.save_file; //Return Boolean Value
+                        },
+                    },
+                
+                ]) //add some testing to prompts and also saving files
+                    .then(function(answers){
+                        try {
+                            if(answers.save_file){
+                                const file_name = answers.file_name;
+                                fs.writeFileSync(`${file_path}/${file_name}.json`, JSON.stringify(response, null, 4), 'utf8'); // pretty print
+                                const spinner = ora(`Saving Results to File...`).start();
+                                setTimeout(function(){
+                                    spinner.succeed(chalk.green(`Results saved to: ${file_path}\\${file_name}.json`)); 
+                                }, 3000);
+                            }
+                            else{
+                                console.log("Results not saved!");
+                            }
+                        } catch (err) {
+                            console.log(err);
+                        }
+                    })
+
             } catch (error) {
-            console.log(`Error Completing Task. More info here: ${error}`);
+            console.log(chalk(`Error Completing Task. More info here: ${error}`));
             }
         }
         else if(result.choice == "View Repository Activity"){
@@ -89,8 +128,46 @@ const optionsArray = ["Track Commit Status", "View Repository Activity", "View N
                         }
                     }
                 )
-           
-                console.log(response.data); //find a way to narrow down to commit
+                const spinner = ora(`Completing Task: ${result.choice}...`).start();
+                setTimeout(function(){
+                    spinner.succeed(chalk.green(console.log(response.data), `Task Completed! Press Any Key to See More Options!`)); //add pagination
+                }, 3000);
+                console.log(response); 
+                return inquirer
+                .prompt([
+                    {
+                        name: "save_file",
+                        type: "confirm",
+                        message: chalk.blue("Save Results to File?: "),
+                    },
+                    {
+                        name: "file_name",
+                        type: "input",
+                        message: chalk.blue("Enter File Name Here: "),
+                        when: function(answers){
+                            return answers.save_file; //Return Boolean Value
+                        },
+                    },
+                
+                ]) //add some testing to prompts and also saving files
+                    .then(function(answers){
+                        try {
+                            if(answers.save_file){
+                                const file_name = answers.file_name;
+                                fs.writeFileSync(`${file_path}/${file_name}.json`, JSON.stringify(response, null, 4), 'utf8'); // pretty print
+                                const spinner = ora(`Saving Results to File...`).start();
+                                setTimeout(function(){
+                                    spinner.succeed(chalk.green(`Results saved to: ${file_path}\\${file_name}.json`)); 
+                                }, 3000);
+                            }
+                            else{
+                                console.log("Results not saved!");
+                            }
+                        } catch (err) {
+                            console.log(err);
+                        }
+                    })
+
             } catch (error) {
             console.log(`Error Completing Task. More info here: ${error}`);
             }
@@ -113,7 +190,47 @@ const optionsArray = ["Track Commit Status", "View Repository Activity", "View N
                     const{login,id,html_url,site_admin, contributions} = contributor;
                     return{login, id,html_url, site_admin, contributions}
                 });
-                console.log(contributors); 
+                
+                const spinner = ora(`Completing Task: ${result.choice}...`).start();
+                setTimeout(function(){
+                    
+                    spinner.succeed(chalk.green(console.log(contributors), `Task Completed! Press Any Key to See More Options!`)); 
+                }, 1000);
+                return inquirer
+                .prompt([
+                    {
+                        name: "save_file",
+                        type: "confirm",
+                        message: chalk.blue("Save Results to File?: "),
+                    },
+                    {
+                        name: "file_name",
+                        type: "input",
+                        message: chalk.blue("Enter File Name Here: "),
+                        when: function(answers){
+                            return answers.save_file; //Return Boolean Value
+                        },
+                    },
+                
+                ]) //add some testing to prompts and also saving files (check if file path already exists and then prompt the user to try again. Find a way to not exit maybe a while loop till the user breaks?)
+                    .then(function(answers){
+                        try {
+                            if(answers.save_file){
+                                const file_name = answers.file_name;
+                                fs.writeFileSync(`${file_path}/${file_name}.json`, JSON.stringify(contributors, null, 4), 'utf8'); // pretty print
+                                const spinner = ora(`Saving Results to File...`).start();
+                                setTimeout(function(){
+                                    spinner.succeed(chalk.green(`Results saved to: ${file_path}\\${file_name}.json`)); 
+                                }, 3000);
+                            }
+                            else{
+                                console.log("Results not saved!");
+                            }
+                        } catch (err) {
+                            console.log(err);
+                        }
+                    })
+
             } catch (error) {
             console.log(`Error Completing Task. More info here: ${error}`);
             }
@@ -132,21 +249,37 @@ const optionsArray = ["Track Commit Status", "View Repository Activity", "View N
                     }
                 )
                 //filter for important information 
-                console.log(response); 
+                let issues_response = response.data.map(function(issue){
+                    const{number, title, user:{login,id}, state, locked, comments, created_at, updated_at, author_association, body, assignee} = issue;
+                    return{number, title, login, id, state, locked, comments, created_at, updated_at, author_association, body, assignee}
+                });
+                const spinner = ora(`Completing Task: ${result.choice}...`).start();
+                setTimeout(function(){
+                    spinner.succeed(console.log(issues_response),chalk.green(`Task Completed! Press Any Key to See More Options!`)); 
+                }, 3000); 
                 return inquirer
                 .prompt([
                     {
                         name: "save_file",
                         type: "confirm",
                         message: chalk.blue("Save Results to File?: "),
-                    },])
+                    },
+                    {
+                        name: "file_name",
+                        type: "input",
+                        message: chalk.blue("Enter File Name Here: "),
+                        when: function(answers){
+                            return answers.save_file; //Return Boolean Value
+                        },
+                    },
+                ])
                     .then(function(answers){
                         try {
                             if(answers.save_file){
-                                fs.writeFileSync(`${file_path}\issues_list.txt`, JSON.stringify(response, null, 4), 'utf8'); // pretty print
+                                fs.writeFileSync(`${file_path}/issues_list.json`, JSON.stringify(issues_response, null, 4), 'utf8'); // pretty print
                                 const spinner = ora(`Saving Results to File...`).start();
                                 setTimeout(function(){
-                                    spinner.succeed(chalk.green(`Results saved to: ${file_path}\\issues_list.txt`)); 
+                                    spinner.succeed(chalk.green(`Results saved to: ${file_path}\\issues_list.json`)); 
                                 }, 3000);
                             }
                             else{
@@ -156,12 +289,6 @@ const optionsArray = ["Track Commit Status", "View Repository Activity", "View N
                             console.log(err);
                         }
                     })
-
-                     //integrate this properly into if condition
-                    const spinner = ora(`Completing Task: ${result.choice}...`).start(); //Start the spinner
-                    setTimeout(function(){
-                    spinner.succeed(chalk.green("Done!"));
-                    }, 3000);
             } catch (error) {
             console.log(`Error Completing Task. More info here: ${error}`);
             }

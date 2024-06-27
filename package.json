@@ -21,6 +21,7 @@
     "express": "^4.19.2",
     "fs": "^0.0.1-security",
     "inquirer": "^8.0.0",
+    "json-colorizer": "^3.0.1",
     "octokit": "^3.2.1",
     "ora": "^5.4.1",
     "yargs": "^17.7.2"
